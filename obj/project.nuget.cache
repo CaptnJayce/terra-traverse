@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "yApuVpHdtYk=",
+  "success": true,
+  "projectFilePath": "/home/captnjayce/.local/share/Terraria/tModLoader/ModSources/TerraTraverse/TerraTraverse.csproj",
+  "expectedPackageFiles": [
+    "/home/captnjayce/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.20/microsoft.aspnetcore.app.ref.8.0.20.nupkg.sha512"
+  ],
+  "logs": []
+}
