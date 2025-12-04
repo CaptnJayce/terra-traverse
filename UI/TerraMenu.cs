@@ -1,76 +1,110 @@
 using Terraria.ModLoader;
-using Terraria.GameContent.UI.Elements;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria.UI;
 using Terraria;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using Terraria.UI;
+using Terraria.GameContent.UI.Elements;
 
-public class TerraMenu : ModMenu
+// TODO:
+// Decompose code
+// Rename some things for clarity
+// Start generating worlds 
+namespace TerraTraverse.UI
 {
-    public override string DisplayName => "TerraTraverse";
-
-    public override void OnSelected() {
-        var ui = new TerraMenuUI();
-        UserInterface?.SetState(ui);
-    }
-
-    public override void Update(bool isOnTitleScreen) {
-        UserInterface?.Update(Main._drawInterfaceGameTime);
-    }
-
-    public override void PostDrawLogo(SpriteBatch spriteBatch, Vector2 logoDrawCenter, float logoRotation, float logoScale, Color drawColor) {
-        UserInterface?.Draw(spriteBatch, Main._drawInterfaceGameTime);
-    }
-}
-
-public class TerraMenuUI : UIState
-{
-    private UITextPanel<string> closeButton;
-
-    public override void OnInitialize()
+    public class TerraTraverseUISystem : ModSystem
     {
-        var panel = new UIPanel()
-        {
-            HAlign = 0.5f,
-            VAlign = 0.55f,
-            Width = new(250, 0f),
-            Height = new(500, 0f),
-            BackgroundColor = new Color(63, 82, 151)
-        };
-        Append(panel);
+        public UserInterface userInterface;
+        public CloseButtonHandler closeButtonHandler;
 
-        closeButton = new UITextPanel<string>("Close")
+        public override void Load()
         {
-            Width = new(120, 0f),
-            Height = new(40, 0f),
-            HAlign = 0.5f,
-            VAlign = 0.8f,
-            BackgroundColor = new Color(63, 82, 151),
-            TextColor = Color.White
-        };
-        closeButton.OnLeftClick += CloseButtonClicked;
-        closeButton.OnUpdate += CloseButtonHoverEffect;
-        panel.Append(closeButton);
-    }
-
-    private void CloseButtonHoverEffect(UIElement affectedElement)
-    {
-        var button = (UITextPanel<string>)affectedElement;
-
-        if (button.IsMouseHovering)
-        {
-            button.TextColor = Color.Yellow;
-            button.BackgroundColor = new Color(80, 100, 180); 
+            userInterface = new UserInterface();
+            closeButtonHandler= new CloseButtonHandler();
+            
+            closeButtonHandler.Activate(); 
         }
-        else
+
+        public override void UpdateUI(GameTime gameTime)
         {
-            button.TextColor = Color.White;
-            button.BackgroundColor = new Color(63, 82, 151);
+            userInterface?.Update(gameTime);
         }
     }
 
-    private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)
+    // Hide most default UI elements
+    public class TerraMenu : ModMenu
     {
-        Main.menuMode = 0;
+        public override bool PreDrawLogo(SpriteBatch spriteBatch, ref Vector2 logoDrawCenter, ref float logoRotation, ref float logoScale, ref Color drawColor)
+        {
+            return false; 
+        }
+
+        public override void OnSelected()
+        {   
+            Main.menuMode = 888;
+                        
+            if (ModContent.GetInstance<TerraTraverseUISystem>().closeButtonHandler!= null)
+            {
+                Main.MenuUI.SetState(ModContent.GetInstance<TerraTraverseUISystem>().closeButtonHandler);
+            }
+        }
+    }
+    
+    // Styling for the close button
+    public class CloseButton : UIPanel
+    {
+        private UIText text;
+        private Color colour = Color.White;
+
+        public CloseButton(string buttonText, Color buttonColour)
+        {
+            Width.Set(150f, 0f);
+            Height.Set(40f, 0f);
+            SetPadding(0); 
+
+            BackgroundColor = new Color(63, 82, 151) * 0.7f;
+
+            text = new UIText(buttonText, 1f, false)
+            {
+                HAlign = 0.5f,
+                VAlign = 0.5f
+            };
+            Append(text);
+            colour = buttonColour;
+        }
+
+        public override void MouseOver(UIMouseEvent evt)
+        {
+            base.MouseOver(evt);
+            BackgroundColor = new Color(73, 94, 171);
+        }
+        
+        public override void MouseOut(UIMouseEvent evt)
+        {
+            base.MouseOut(evt);
+            BackgroundColor = new Color(63, 82, 151) * 0.7f;
+        }
+    }
+
+    // Logic for closing menu
+    public class CloseButtonHandler : UIState
+    {
+        public CloseButton MyTextButton; 
+
+        public override void OnInitialize()
+        {
+            MyTextButton = new CloseButton("Close Menu", Color.White); 
+            
+            MyTextButton.Left.Set(100f, 0f);
+            MyTextButton.Top.Set(200f, 0f);
+            
+            MyTextButton.OnLeftClick += new MouseEvent(CloseMenu);
+            
+            Append(MyTextButton);
+        }
+
+        private void CloseMenu(UIMouseEvent evt, UIElement listeningElement)
+        {
+            Main.menuMode = 0;
+        }
     }
 }
