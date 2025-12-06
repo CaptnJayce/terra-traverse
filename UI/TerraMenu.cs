@@ -4,12 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
-using Terraria.WorldBuilding;
-using Terraria.IO;
+using TerraTraverse.WorldGeneration;
+using Terraria.Utilities;
 
 // TODO:
-// Decompose code
-// Rename some things for clarity
 // Start generating worlds 
 namespace TerraTraverse.UI
 {
@@ -37,15 +35,19 @@ namespace TerraTraverse.UI
             SetPadding(4);
             BackgroundColor = new Color(50, 200, 50);
 
-            UIText generate = new UIText("Generate World");
-            generate.HAlign = 0.5f;
-            generate.VAlign = 0.5f;
+            UIText generate = new UIText("Generate World")
+            {
+                HAlign = 0.5f,
+                VAlign = 0.5f
+            };
             Append(generate);
         }
     }
 
     public class TerraUI : UIState
     {
+        private static TerraGen _terraGen;
+
         public void SetupUI()
         {
             CloseButton closeButton = new CloseButton
@@ -53,7 +55,7 @@ namespace TerraTraverse.UI
                 VAlign = 0.5f,
                 HAlign = 1f
             };
-            closeButton.OnLeftClick += new MouseEvent(CloseMenu);
+            closeButton.OnLeftClick += CloseMenu;
             Append(closeButton);
 
             GenerateWorldButton generateWorldButton = new GenerateWorldButton
@@ -61,27 +63,22 @@ namespace TerraTraverse.UI
                 VAlign = 0.5f,
                 HAlign = 0.5f
             };
-            generateWorldButton.OnLeftClick += new MouseEvent(CreateWorld);
+            generateWorldButton.OnLeftClick += CreateWorld;
             Append(generateWorldButton);
         }
 
-        private void CreateWorld(UIMouseEvent evt, UIElement listeningElement)
+        private static void CreateWorld(UIMouseEvent evt, UIElement listeningElement)
         {
-            // This does NOT work lol. Gets stuck at Settling Liquids 34%
-            WorldFileData worldData = new WorldFileData();
-            WorldFile.SaveWorld();
-            Main.ActiveWorldFileData = worldData;
+            _terraGen = new TerraGen();
+            _terraGen.InitWorldParams();
 
-            Main.WorldFileMetadata = worldData.Metadata;
-            WorldGen.GenerateWorld(Main.ActiveWorldFileData.WorldSizeX); 
-
-            WorldFile.SaveWorld();
-            Main.menuMode = 10;
-
-            // WorldGen.CreateNewWorld();
+            WorldGen._genRand = new UnifiedRandom();
+            WorldGen.CreateNewWorld();
+            
+            Main.menuMode = 0;
         }
 
-        private void CloseMenu(UIMouseEvent evt, UIElement listeningElement)
+        private static void CloseMenu(UIMouseEvent evt, UIElement listeningElement)
         {
             Main.menuMode = 0;
         }
