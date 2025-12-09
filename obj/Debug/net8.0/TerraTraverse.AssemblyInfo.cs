@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TerraTraverse")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bd8f6d9be6f566b37f53806382a24d3d38520d2e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8da95eabc513fb07a1f1cb334d089d6c560cd60f")]
 [assembly: System.Reflection.AssemblyProductAttribute("TerraTraverse")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TerraTraverse")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
